@@ -12,8 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
     
-    <!-- Custom styles -->
     <style>
+        /* Custom styles */
         .game-container {
             position: relative;
             width: 100%;
@@ -75,11 +75,6 @@
     <!-- Main app container -->
     <div id="root"></div>
 
-    <!-- Toast notification -->
-    <div id="toast" class="toast">
-        Game Reset Successfully!
-    </div>
-
     <!-- Error boundary -->
     <div id="error-boundary" class="hidden fixed inset-0 flex items-center justify-center bg-red-100 bg-opacity-75">
         <div class="bg-white p-6 rounded-lg shadow-lg">
@@ -93,32 +88,13 @@
         </div>
     </div>
 
+    <!-- Toast notification -->
+    <div id="toast" class="toast">
+        Game Reset Successfully!
+    </div>
+
     <!-- Audio handling -->
     <script>
-        const audioFiles = {
-            fire: new Audio("{{ url_for('static', filename='sounds/fireplace-6160.wav') }}"),
-            water: new Audio("{{ url_for('static', filename='sounds/water.wav') }}"),
-            air: new Audio("{{ url_for('static', filename='sounds/air.wav') }}"),
-            earth: new Audio("{{ url_for('static', filename='sounds/earth.wav') }}"),
-            eureka: new Audio("{{ url_for('static', filename='sounds/Eureka.wav') }}")
-        };
-
-        audioFiles.fire.loop = true;
-
-        function playSound(element) {
-            Object.values(audioFiles).forEach(audio => audio.pause());
-            const sound = audioFiles[element];
-            if (sound) {
-                sound.currentTime = 0;
-                sound.play().catch(e => console.log('Error playing sound:', e));
-            }
-        }
-
-        function stopFireSound() {
-            audioFiles.fire.pause();
-            audioFiles.fire.currentTime = 0;
-        }
-
         function showToast(message, duration = 3000) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -134,16 +110,14 @@
 
     <!-- Initialize the game -->
     <script>
-        // Error handling
-        window.onerror = function(msg, url, line) {
-            document.getElementById('error-boundary').classList.remove('hidden');
-            document.getElementById('error-message').textContent = `${msg} (Line: ${line})`;
-            return false;
-        };
-
-        // Wait for both the DOM and the ElementsGame component to be loaded
-        window.addEventListener('DOMContentLoaded', function() {
-            // Check if ElementsGame is defined
+        console.log('Document loaded');
+        
+        function initializeGame() {
+            console.log('Initializing game');
+            console.log('ElementsGame exists:', typeof ElementsGame !== 'undefined');
+            console.log('React exists:', typeof React !== 'undefined');
+            console.log('ReactDOM exists:', typeof ReactDOM !== 'undefined');
+            
             if (typeof ElementsGame === 'undefined') {
                 console.error('ElementsGame component not loaded!');
                 document.getElementById('error-boundary').classList.remove('hidden');
@@ -151,10 +125,24 @@
                 return;
             }
 
-            // Render the game
-            const root = document.getElementById('root');
-            ReactDOM.render(React.createElement(ElementsGame), root);
-        });
+            try {
+                console.log('Attempting to render ElementsGame');
+                const root = document.getElementById('root');
+                ReactDOM.render(React.createElement(ElementsGame), root);
+                console.log('ElementsGame rendered successfully');
+            } catch (error) {
+                console.error('Error rendering ElementsGame:', error);
+                document.getElementById('error-boundary').classList.remove('hidden');
+                document.getElementById('error-message').textContent = `Error rendering game: ${error.message}`;
+            }
+        }
+
+        // Wait for both DOM and script loading
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeGame);
+        } else {
+            initializeGame();
+        }
     </script>
 </body>
 </html>
