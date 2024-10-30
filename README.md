@@ -4,8 +4,9 @@
 Simple demo game that opens your camera, tracks movement, gestures and humans, and has a funny trick when all elements are placed in the combine box.  
 
 ![image](https://github.com/user-attachments/assets/c399e211-0d9c-45a5-9ee8-929d717bff2d)
-![image](https://github.com/user-attachments/assets/7937ef1c-f8fb-4263-b4cb-19d6be8c48fb)
-![image](https://github.com/user-attachments/assets/40185199-fe96-408b-9a45-9ff04044c15d)
+![image](https://github.com/user-attachments/assets/1a731221-7b8e-4488-811e-9ccd8b0aad05)
+![image](https://github.com/user-attachments/assets/5f8a77d0-ce1f-43b9-93a8-357e871640bd)
+
 
 
 
