@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elements Game</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    
+    <!-- React and ReactDOM -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+    
+    <!-- Custom styles -->
+    <style>
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 75%;
+        }
+
+        .game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .loading {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Loading indicator -->
+    <div id="loading" class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50 hidden">
+        <div class="loading"></div>
+    </div>
+
+    <!-- Main app container -->
+    <div id="root"></div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast">
+        Game Reset Successfully!
+    </div>
+
+    <!-- Error boundary -->
+    <div id="error-boundary" class="hidden fixed inset-0 flex items-center justify-center bg-red-100 bg-opacity-75">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-xl font-bold text-red-600 mb-2">Oops! Something went wrong</h3>
+            <p id="error-message" class="text-gray-600"></p>
+            <button 
+                class="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                onclick="window.location.reload()">
+                Reload Game
+            </button>
+        </div>
+    </div>
+
+    <!-- Audio handling -->
+    <script>
+        const audioFiles = {
+            fire: new Audio("{{ url_for('static', filename='sounds/fireplace-6160.wav') }}"),
+            water: new Audio("{{ url_for('static', filename='sounds/water.wav') }}"),
+            air: new Audio("{{ url_for('static', filename='sounds/air.wav') }}"),
+            earth: new Audio("{{ url_for('static', filename='sounds/earth.wav') }}"),
+            eureka: new Audio("{{ url_for('static', filename='sounds/Eureka.wav') }}")
+        };
+
+        audioFiles.fire.loop = true;
+
+        function playSound(element) {
+            Object.values(audioFiles).forEach(audio => audio.pause());
+            const sound = audioFiles[element];
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log('Error playing sound:', e));
+            }
+        }
+
+        function stopFireSound() {
+            audioFiles.fire.pause();
+            audioFiles.fire.currentTime = 0;
+        }
+
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+    </script>
+
+    <!-- Load ElementsGame component -->
+    <script src="{{ url_for('static', filename='js/ElementsGame.js') }}"></script>
+
+    <!-- Initialize the game -->
+    <script>
+        // Error handling
+        window.onerror = function(msg, url, line) {
+            document.getElementById('error-boundary').classList.remove('hidden');
+            document.getElementById('error-message').textContent = `${msg} (Line: ${line})`;
+            return false;
+        };
+
+        // Wait for both the DOM and the ElementsGame component to be loaded
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check if ElementsGame is defined
+            if (typeof ElementsGame === 'undefined') {
+                console.error('ElementsGame component not loaded!');
+                document.getElementById('error-boundary').classList.remove('hidden');
+                document.getElementById('error-message').textContent = 'Game component failed to load. Please refresh the page.';
+                return;
+            }
+
+            // Render the game
+            const root = document.getElementById('root');
+            ReactDOM.render(React.createElement(ElementsGame), root);
+        });
+    </script>
+</body>
+</html>
